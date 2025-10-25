@@ -128,7 +128,13 @@ async function handleAddText() {
         }
     } catch (error) {
         console.error('Error:', error);
-        showStatus(`❌ 送信エラー: ${error.message}`, 'error');
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            type: error.constructor.name,
+            endpoint: ENDPOINT
+        });
+        showStatus(`❌ 送信エラー: ${error.message || 'ネットワークエラー'}`, 'error');
     } finally {
         isProcessing = false;
         toggleButton('addTextBtn', false);
