@@ -1,0 +1,28 @@
+# 機密情報（アップロードしない）
+.env
+secrets.json
+
+# エディタ設定
+.vscode/
+.idea/
+
+# OS生成ファイル
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 一時ファイル
+*.tmp
+*.bak
+*~
+
+# Node modules（使用する場合）
+node_modules/
+
+# ログファイル
+*.log
+
+# Googleドライブのショートカットファイル（追跡不要）
+*.gdoc
+*.gslides
+*.gsheet

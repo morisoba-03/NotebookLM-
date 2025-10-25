@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NotebookLM Input Hub</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+<header>
+<h1>NotebookLM Input Hub</h1>
+<p class="subtitle">テキストメモと画像をNotebookLMに追加</p>
+</header>
+<main>
+<section class="input-section">
+<h2>テキストメモを追加</h2>
+<textarea id="textInput" placeholder="メモを入力してください..." rows="6"></textarea>
+<button id="addTextBtn" class="btn btn-primary">メモを追加</button>
+</section>
+<section class="input-section">
+<h2>画像・PDFを追加</h2>
+<div class="file-input-wrapper">
+<input type="file" id="imageInput" accept="image/jpeg,image/png,image/jpg,application/pdf" multiple capture="environment">
+<label for="imageInput" class="file-label">
+<span class="icon">📁</span>
+<span class="label-text">ファイルを選択 (JPEG/PNG/PDF)</span>
+</label>
+<button id="cameraBtn" class="btn btn-camera">
+<span class="icon">📷</span>
+<span class="label-text">カメラで撮影</span>
+</button>
+<div id="fileNames" class="file-names"></div>
+</div>
+<div class="note-wrapper">
+<input type="text" id="imageNote" placeholder="画像の注記（省略可）" maxlength="100">
+</div>
+<button id="addImageBtn" class="btn btn-secondary">ファイルを追加</button>
+</section>
+<div id="status" class="status"></div>
+</main>
+<footer>
+<div class="settings-link">
+<a href="settings.html" class="btn-link">設定</a>
+</div>
+<p class="info">メモはGoogleドキュメントに、画像はGoogleスライドに追加されます<br>NotebookLMへの反映には数分かかる場合があります</p>
+</footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

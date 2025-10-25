@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>設定 - NotebookLM Input Hub</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.settings-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.setting-item {
+    margin-bottom: 24px;
+}
+.setting-item label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+.setting-item input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: monospace;
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+.setting-item input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+.setting-item .help-text {
+    font-size: 13px;
+    color: #5f6368;
+    margin-top: 4px;
+}
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+}
+.btn-full {
+    flex: 1;
+}
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+.back-link:hover {
+    text-decoration: underline;
+}
+</style>
+</head>
+<body>
+<div class="settings-container">
+<header>
+<h1>設定</h1>
+<p class="subtitle">書き込み先のドキュメントとスライドを設定</p>
+</header>
+<main>
+<div class="setting-item">
+<label for="docId">GoogleドキュメントID</label>
+<input type="text" id="docId" placeholder="例: 1cR6575SP7YB9QquRgkH7qOInjTnak4vet0EJ-q6CNXQ">
+<p class="help-text">テキストメモを追記するドキュメントのID（URLの/d/と/editの間）</p>
+</div>
+<div class="setting-item">
+<label for="slidesId">GoogleスライドID</label>
+<input type="text" id="slidesId" placeholder="例: 133qTK5HyZGjPqbA2NtQm8_cic8K1r4ydQ-nRTZ9jm-I">
+<p class="help-text">画像・PDFを追加するスライドのID（URLの/d/と/editの間）</p>
+</div>
+<div class="button-group">
+<button id="saveBtn" class="btn btn-primary btn-full">保存</button>
+<button id="resetBtn" class="btn btn-secondary btn-full">リセット</button>
+</div>
+<div id="status" class="status"></div>
+<a href="index.html" class="back-link">← メイン画面に戻る</a>
+</main>
+</div>
+<script src="settings.js"></script>
+</body>
+</html>
