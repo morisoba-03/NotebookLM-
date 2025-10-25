@@ -3,10 +3,10 @@
 // ========================================
 
 // GASのWebアプリURL（デプロイ後に設定）
-const ENDPOINT = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbyLAQUkFr4GXAzh4ofBwwjRX4ecBQfg1S5bRKxWckBg0A2-vZaHvaqNKKGCbOOa4qIO/exec";
 
 // Code.gsと同じAPI_KEYを設定してください（強力なランダム文字列）
-const API_KEY = "your-strong-random-api-key-here";
+const API_KEY = "Nb7kQ2xP9mR4sL8vW3nF6jH5tY1cA0zE";
 
 // ========================================
 // グローバル変数

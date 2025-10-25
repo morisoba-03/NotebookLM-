@@ -2,8 +2,8 @@
 // 設定画面のロジック
 // ========================================
 
-const DEFAULT_DOC_ID = 'YOUR_GOOGLE_DOC_ID';
-const DEFAULT_SLIDES_ID = 'YOUR_GOOGLE_SLIDES_ID';
+const DEFAULT_DOC_ID = '1cR6575SP7YB9QquRgkH7qOInjTnak4vet0EJ-q6CNXQ';
+const DEFAULT_SLIDES_ID = '133qTK5HyZGjPqbA2NtQm8_cic8K1r4ydQ-nRTZ9jm-I';
 
 // ページ読み込み時に実行
 document.addEventListener('DOMContentLoaded', () => {
