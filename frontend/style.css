@@ -86,9 +86,18 @@ h2 {
     box-shadow: var(--shadow);
 }
 
+/* ========================================
+   音声入力エリア
+   ======================================== */
+.textarea-wrapper {
+    position: relative;
+    margin-bottom: 12px;
+}
+
 textarea {
     width: 100%;
     padding: 12px;
+    padding-right: 56px; /* マイクボタンのスペース */
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 16px;
@@ -96,7 +105,6 @@ textarea {
     background: var(--bg-color);
     color: var(--text-color);
     resize: vertical;
-    margin-bottom: 12px;
     transition: border-color 0.2s;
     min-height: 100px;
 }
@@ -104,6 +112,50 @@ textarea {
 textarea:focus {
     outline: none;
     border-color: var(--primary-color);
+}
+
+.btn-voice {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+}
+
+.btn-voice:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn-voice:active {
+    transform: scale(0.95);
+}
+
+.btn-voice.listening {
+    background: var(--error-color);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
 }
 
 /* ========================================

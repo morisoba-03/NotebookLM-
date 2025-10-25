@@ -3,13 +3,13 @@
 // ========================================
 
 // フロント（app.js）と同じAPI_KEYを設定してください
-const API_KEY = 'your-strong-random-api-key-here';
+const API_KEY = 'Nb7kQ2xP9mR4sL8vW3nF6jH5tY1cA0zE';
 
 // 追記先のGoogleドキュメントID
-const DOC_ID = 'YOUR_GOOGLE_DOC_ID';
+const DOC_ID = '1cR6575SP7YB9QquRgkH7qOInjTnak4vet0EJ-q6CNXQ';
 
 // 画像を追加するGoogleスライドID（NotebookLMのソース）
-const SLIDES_ID = 'YOUR_GOOGLE_SLIDES_ID';
+const SLIDES_ID = '133qTK5HyZGjPqbA2NtQm8_cic8K1r4ydQ-nRTZ9jm-I';
 
 // ========================================
 // メインエントリーポイント
