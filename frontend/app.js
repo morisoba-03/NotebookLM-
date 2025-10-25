@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // テキスト追加ボタン
     addTextBtn.addEventListener('click', handleAddText);
 
-    // 音声入力ボタン
-    voiceBtn.addEventListener('click', handleVoiceInput);
+    // 音声入力の初期化（トランシーバー方式）
+    initVoiceInput();
 
     // 画像追加ボタン
     addImageBtn.addEventListener('click', handleAddImage);
@@ -83,111 +83,201 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ========================================
-// 音声入力処理
+// 音声入力処理（トランシーバー方式：押している間だけ録音）
 // ========================================
 let recognition = null;
 let isListening = false;
+let finalTranscript = ''; // 確定したテキスト
 
-function handleVoiceInput() {
-    console.log('Voice input button clicked');
-    
+function initVoiceInput() {
     const voiceBtn = document.getElementById('voiceBtn');
-    const textInput = document.getElementById('textInput');
-
+    
     // Web Speech APIのサポート確認
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
-    console.log('SpeechRecognition available:', !!SpeechRecognition);
-    
     if (!SpeechRecognition) {
-        alert('お使いのブラウザは音声認識に対応していません。\nChrome、Edge、Safariの最新版をお試しください。');
-        showStatus('❌ お使いのブラウザは音声認識に対応していません', 'error');
+        console.log('SpeechRecognition not supported');
+        voiceBtn.disabled = true;
+        voiceBtn.title = 'お使いのブラウザは音声認識に対応していません';
         return;
     }
 
-    // すでに認識中なら停止
-    if (isListening) {
-        console.log('Stopping recognition');
+    // 音声認識の初期化（一度だけ作成）
+    recognition = new SpeechRecognition();
+    recognition.lang = 'ja-JP'; // 日本語
+    recognition.continuous = false; // 一度に短い発話を認識
+    recognition.interimResults = true; // 途中経過も表示
+    
+    console.log('Recognition initialized');
+
+    // 認識結果
+    recognition.onresult = (event) => {
+        console.log('Recognition result received, results count:', event.results.length);
+        
+        let interimTranscript = ''; // 途中経過
+        
+        // 最後の結果のみを取得（重複を防ぐ）
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                // 確定した結果
+                finalTranscript += transcript;
+                console.log('Final transcript:', transcript);
+            } else {
+                // 途中経過
+                interimTranscript += transcript;
+                console.log('Interim transcript:', transcript);
+            }
+        }
+
+        // リアルタイムプレビュー（途中経過を薄く表示）
+        const textInput = document.getElementById('textInput');
+        const preview = finalTranscript + (interimTranscript ? ' [' + interimTranscript + ']' : '');
+        console.log('Preview:', preview);
+    };
+
+    // エラー処理
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        
+        // abortは手動停止なので無視
+        if (event.error === 'aborted') {
+            return;
+        }
+        
+        let errorMessage = '音声認識エラー';
+        if (event.error === 'no-speech') {
+            errorMessage = '音声が検出されませんでした';
+        } else if (event.error === 'not-allowed') {
+            errorMessage = 'マイクの使用が許可されていません。ブラウザの設定を確認してください。';
+            alert('マイクの使用許可が必要です。\nブラウザの設定からマイクへのアクセスを許可してください。');
+        } else if (event.error === 'network') {
+            errorMessage = 'ネットワークエラーが発生しました';
+        }
+        
+        showStatus(`❌ ${errorMessage}`, 'error');
+    };
+
+    // 認識終了
+    recognition.onend = () => {
+        console.log('Recognition ended, finalTranscript:', finalTranscript);
+        
+        if (isListening) {
+            // まだボタンが押されている場合は再開
+            try {
+                recognition.start();
+                console.log('Recognition restarted (button still pressed)');
+            } catch (error) {
+                console.error('Error restarting recognition:', error);
+            }
+        }
+    };
+
+    // トランシーバー方式：押している間だけ録音
+    let startX = 0, startY = 0;
+    
+    // マウス/タッチ開始
+    const handleStart = (e) => {
+        e.preventDefault();
+        console.log('Voice button pressed (start)');
+        
+        // 位置を記録（スワイプ判定用）
+        if (e.type === 'touchstart') {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        } else {
+            startX = e.clientX;
+            startY = e.clientY;
+        }
+        
+        startRecording();
+    };
+    
+    // マウス/タッチ終了
+    const handleEnd = (e) => {
+        e.preventDefault();
+        console.log('Voice button released (end)');
+        stopRecording();
+    };
+    
+    // タッチ移動（ボタンから離れたら停止）
+    const handleMove = (e) => {
+        if (e.type === 'touchmove' && isListening) {
+            const touch = e.touches[0];
+            const deltaX = Math.abs(touch.clientX - startX);
+            const deltaY = Math.abs(touch.clientY - startY);
+            
+            // 50px以上移動したら離れたと判定
+            if (deltaX > 50 || deltaY > 50) {
+                console.log('Touch moved away from button');
+                stopRecording();
+            }
+        }
+    };
+
+    // イベントリスナー登録
+    voiceBtn.addEventListener('mousedown', handleStart);
+    voiceBtn.addEventListener('mouseup', handleEnd);
+    voiceBtn.addEventListener('mouseleave', handleEnd); // マウスがボタンから離れた
+    
+    voiceBtn.addEventListener('touchstart', handleStart, { passive: false });
+    voiceBtn.addEventListener('touchend', handleEnd, { passive: false });
+    voiceBtn.addEventListener('touchcancel', handleEnd, { passive: false });
+    voiceBtn.addEventListener('touchmove', handleMove, { passive: false });
+}
+
+// 録音開始
+function startRecording() {
+    if (isListening || !recognition) return;
+    
+    const voiceBtn = document.getElementById('voiceBtn');
+    const textInput = document.getElementById('textInput');
+    
+    try {
+        finalTranscript = ''; // リセット
+        recognition.start();
+        isListening = true;
+        voiceBtn.classList.add('listening');
+        voiceBtn.innerHTML = '<span class="icon">🎤</span><span class="label-text">録音中...</span>';
+        showStatus('🎤 話してください（ボタンを押し続けてください）', 'info');
+        console.log('Recording started');
+    } catch (error) {
+        console.error('Error starting recognition:', error);
+        showStatus('❌ 音声認識の開始に失敗しました', 'error');
+    }
+}
+
+// 録音停止
+function stopRecording() {
+    if (!isListening || !recognition) return;
+    
+    const voiceBtn = document.getElementById('voiceBtn');
+    const textInput = document.getElementById('textInput');
+    
+    try {
         recognition.stop();
         isListening = false;
         voiceBtn.classList.remove('listening');
         voiceBtn.innerHTML = '<span class="icon">🎤</span><span class="label-text">音声入力</span>';
-        showStatus('音声入力を停止しました', 'info');
-        return;
-    }
-
-    try {
-        // 音声認識の初期化
-        recognition = new SpeechRecognition();
-        recognition.lang = 'ja-JP'; // 日本語
-        recognition.continuous = true; // 継続的に認識
-        recognition.interimResults = true; // 途中経過も表示
         
-        console.log('Recognition initialized');
-
-        // 認識開始
-        recognition.start();
-        isListening = true;
-        voiceBtn.classList.add('listening');
-        voiceBtn.innerHTML = '<span class="icon">🎤</span><span class="label-text">停止</span>';
-        showStatus('🎤 音声入力中... (もう一度タップで停止)', 'info');
+        console.log('Recording stopped, final result:', finalTranscript);
         
-        console.log('Recognition started');
-
-        // 認識結果
-        recognition.onresult = (event) => {
-            console.log('Recognition result received');
-            let transcript = '';
-            
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                transcript += event.results[i][0].transcript;
-            }
-
-            console.log('Transcript:', transcript);
-
-            // テキストエリアに追記（既存テキストの後ろに追加）
+        // 確定したテキストをテキストエリアに追加
+        if (finalTranscript.trim()) {
             const currentText = textInput.value;
             if (currentText && !currentText.endsWith('\n')) {
-                textInput.value = currentText + '\n' + transcript;
+                textInput.value = currentText + '\n' + finalTranscript;
             } else {
-                textInput.value = currentText + transcript;
+                textInput.value = currentText + finalTranscript;
             }
-        };
-
-        // エラー処理
-        recognition.onerror = (event) => {
-            console.error('Speech recognition error:', event.error);
-            isListening = false;
-            voiceBtn.classList.remove('listening');
-            voiceBtn.innerHTML = '<span class="icon">🎤</span><span class="label-text">音声入力</span>';
-            
-            let errorMessage = '音声認識エラー';
-            if (event.error === 'no-speech') {
-                errorMessage = '音声が検出されませんでした';
-            } else if (event.error === 'not-allowed') {
-                errorMessage = 'マイクの使用が許可されていません。ブラウザの設定を確認してください。';
-                alert('マイクの使用許可が必要です。\nブラウザの設定からマイクへのアクセスを許可してください。');
-            } else if (event.error === 'network') {
-                errorMessage = 'ネットワークエラーが発生しました';
-            }
-            
-            showStatus(`❌ ${errorMessage}`, 'error');
-        };
-
-        // 認識終了
-        recognition.onend = () => {
-            console.log('Recognition ended');
-            isListening = false;
-            voiceBtn.classList.remove('listening');
-            voiceBtn.innerHTML = '<span class="icon">🎤</span><span class="label-text">音声入力</span>';
-            if (textInput.value.trim()) {
-                showStatus('✅ 音声入力が完了しました', 'success');
-            }
-        };
+            showStatus('✅ 音声入力が完了しました', 'success');
+        } else {
+            showStatus('音声が認識されませんでした', 'info');
+        }
+        
+        finalTranscript = ''; // リセット
     } catch (error) {
-        console.error('Error initializing speech recognition:', error);
-        alert('音声認識の初期化に失敗しました: ' + error.message);
-        showStatus('❌ 音声認識の初期化に失敗しました', 'error');
+        console.error('Error stopping recognition:', error);
     }
 }
 
