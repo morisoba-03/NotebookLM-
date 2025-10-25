@@ -14,6 +14,37 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // リセットボタン
     document.getElementById('resetBtn').addEventListener('click', resetSettings);
+    
+    // ドキュメントを開くボタン
+    document.getElementById('openDocBtn').addEventListener('click', () => {
+        const docId = document.getElementById('docId').value.trim();
+        if (docId) {
+            window.open(`https://docs.google.com/document/d/${docId}/edit`, '_blank');
+        } else {
+            showStatus('ドキュメントIDを入力してください', 'error');
+        }
+    });
+    
+    // スライドを開くボタン
+    document.getElementById('openSlidesBtn').addEventListener('click', () => {
+        const slidesId = document.getElementById('slidesId').value.trim();
+        if (slidesId) {
+            window.open(`https://docs.google.com/presentation/d/${slidesId}/edit`, '_blank');
+        } else {
+            showStatus('スライドIDを入力してください', 'error');
+        }
+    });
+    
+    // 入力時にボタンの表示/非表示を切り替え
+    document.getElementById('docId').addEventListener('input', (e) => {
+        document.getElementById('openDocBtn').style.display = e.target.value.trim() ? 'block' : 'none';
+    });
+    document.getElementById('slidesId').addEventListener('input', (e) => {
+        document.getElementById('openSlidesBtn').style.display = e.target.value.trim() ? 'block' : 'none';
+    });
+    
+    // 初期表示の制御
+    updateButtonVisibility();
 });
 
 // 設定を読み込む
@@ -23,6 +54,18 @@ function loadSettings() {
     
     document.getElementById('docId').value = docId;
     document.getElementById('slidesId').value = slidesId;
+    
+    // ボタンの表示制御
+    updateButtonVisibility();
+}
+
+// ボタンの表示制御
+function updateButtonVisibility() {
+    const docId = document.getElementById('docId').value.trim();
+    const slidesId = document.getElementById('slidesId').value.trim();
+    
+    document.getElementById('openDocBtn').style.display = docId ? 'block' : 'none';
+    document.getElementById('openSlidesBtn').style.display = slidesId ? 'block' : 'none';
 }
 
 // 設定を保存する
